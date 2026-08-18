@@ -16,27 +16,13 @@ final class GlassTabBarView: UIView {
     private(set) var tabCount: Int
     private var segmentedTrailingConstraint: NSLayoutConstraint?
 
-    /// Whether the segmented control's glass responds to touch. Energized glass also washes
-    /// tab content toward white while it is active, so this is worth turning off when the
-    /// tab items use a custom tint.
-    var interactiveGlass: Bool {
-        didSet {
-            guard interactiveGlass != oldValue else { return }
-            let effect = UIGlassEffect()
-            effect.isInteractive = interactiveGlass
-            segmentedGlassView.effect = effect
-        }
-    }
-
     init(
         segmentedControl: TabBarSegmentedControl,
         tabCount: Int,
-        action: FabBarAction,
-        interactiveGlass: Bool
+        action: FabBarAction
     ) {
         self.segmentedControl = segmentedControl
         self.tabCount = tabCount
-        self.interactiveGlass = interactiveGlass
 
         // Create glass container effect for morphing
         let containerEffect = UIGlassContainerEffect()
@@ -45,7 +31,7 @@ final class GlassTabBarView: UIView {
 
         // Create segmented control glass effect
         let segmentedGlassEffect = UIGlassEffect()
-        segmentedGlassEffect.isInteractive = interactiveGlass
+        segmentedGlassEffect.isInteractive = true
         segmentedGlassView = UIVisualEffectView(effect: segmentedGlassEffect)
 
         // Create FAB button

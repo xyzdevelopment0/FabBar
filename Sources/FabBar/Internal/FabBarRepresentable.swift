@@ -10,7 +10,6 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
     var tabs: [FabBarTab<Value>]
     var action: FabBarAction
     var inactiveTint: Color?
-    var interactiveGlass: Bool
 
     @Binding var activeTab: Value
 
@@ -46,8 +45,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         let container = GlassTabBarView(
             segmentedControl: control,
             tabCount: tabs.count,
-            action: action,
-            interactiveGlass: interactiveGlass
+            action: action
         )
 
         return container
@@ -59,7 +57,6 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         let control = uiView.segmentedControl
         control.selectedSegmentTintColor = segmentTintColor(for: uiView.traitCollection)
         control.inactiveTintColor = inactiveTintColor
-        uiView.interactiveGlass = interactiveGlass
 
         // Sync segments when tabs change (count, order, or identity)
         let currentTabValues = tabs.map(\.value)

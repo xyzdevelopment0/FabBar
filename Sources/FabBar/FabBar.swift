@@ -47,9 +47,6 @@ public struct FabBar<Value: Hashable>: View {
     /// The color of unselected tab items. Defaults to `.label` when `nil`.
     public var inactiveTint: Color?
 
-    /// Whether the tab items' glass responds to touch. Defaults to `true`.
-    public var interactiveGlass: Bool
-
     /// Creates a FabBar with the specified configuration.
     ///
     /// - Parameters:
@@ -57,20 +54,16 @@ public struct FabBar<Value: Hashable>: View {
     ///   - tabs: The tabs to display.
     ///   - action: The floating action button configuration.
     ///   - inactiveTint: The color of unselected tab items. Defaults to `.label`.
-    ///   - interactiveGlass: Whether the tab items' glass responds to touch. Energized glass
-    ///     also washes tab content toward white while active.
     public init(
         selection: Binding<Value>,
         tabs: [FabBarTab<Value>],
         action: FabBarAction,
-        inactiveTint: Color? = nil,
-        interactiveGlass: Bool = true
+        inactiveTint: Color? = nil
     ) {
         self._selection = selection
         self.tabs = tabs
         self.action = action
         self.inactiveTint = inactiveTint
-        self.interactiveGlass = interactiveGlass
     }
 
     public var body: some View {
@@ -85,7 +78,6 @@ public struct FabBar<Value: Hashable>: View {
                 tabs: tabs,
                 action: action,
                 inactiveTint: inactiveTint,
-                interactiveGlass: interactiveGlass,
                 activeTab: $selection
             )
             .frame(height: Constants.barHeight)

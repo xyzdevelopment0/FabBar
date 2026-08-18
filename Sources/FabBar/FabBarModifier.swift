@@ -15,7 +15,6 @@ struct FabBarModifier<Value: Hashable>: ViewModifier {
     let action: FabBarAction
     let isVisible: Bool
     let inactiveTint: Color?
-    let interactiveGlass: Bool
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var bottomSafeAreaInset: CGFloat = 0
@@ -43,7 +42,7 @@ struct FabBarModifier<Value: Hashable>: ViewModifier {
         content
             .safeAreaBar(edge: .bottom) {
                 if showsFabBar {
-                    FabBar(selection: $selection, tabs: tabs, action: action, inactiveTint: inactiveTint, interactiveGlass: interactiveGlass)
+                    FabBar(selection: $selection, tabs: tabs, action: action, inactiveTint: inactiveTint)
                         .padding(.horizontal, Constants.horizontalPadding)
                         .padding(.bottom, Constants.bottomPadding)
                 }
@@ -88,8 +87,7 @@ public extension View {
         tabs: [FabBarTab<Value>],
         action: FabBarAction,
         isVisible: Bool = true,
-        inactiveTint: Color? = nil,
-        interactiveGlass: Bool = true
+        inactiveTint: Color? = nil
     ) -> some View {
         modifier(
             FabBarModifier(
@@ -97,8 +95,7 @@ public extension View {
                 tabs: tabs,
                 action: action,
                 isVisible: isVisible,
-                inactiveTint: inactiveTint,
-                interactiveGlass: interactiveGlass
+                inactiveTint: inactiveTint
             )
         )
     }
