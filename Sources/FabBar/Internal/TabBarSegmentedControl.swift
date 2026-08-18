@@ -226,9 +226,25 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// and selection indicators. We hide all of them because:
     /// - The glass effect comes from UIGlassEffect on the parent view, not from these images
     /// - Segmented control comes with a default background tint which we don't want to mimic the standard tab bar appearance
+    ///
+    /// UISegment also adds its own highlight image view on touch down. That one lives inside
+    /// the segment subtree rather than alongside the control's own subviews, so it needs a
+    /// recursive pass — otherwise it renders as a brief flash behind the tapped tab.
     private func hideSegmentBackgrounds() {
         for subview in subviews where subview is UIImageView {
             subview.alpha = 0
+        }
+        for segmentView in findSegmentViews() {
+            hideImageViewsRecursively(in: segmentView)
+        }
+    }
+
+    private func hideImageViewsRecursively(in view: UIView) {
+        if let imageView = view as? UIImageView {
+            imageView.alpha = 0
+        }
+        for subview in view.subviews {
+            hideImageViewsRecursively(in: subview)
         }
     }
 
