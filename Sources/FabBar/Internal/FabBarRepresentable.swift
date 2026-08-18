@@ -116,7 +116,12 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
 
     private func makeContentView(for tab: FabBarTab<Value>) -> TabItemContentView {
         if let imageName = tab.image {
-            TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
+            TabItemContentView(
+                title: tab.title,
+                imageName: imageName,
+                imageBundle: tab.imageBundle,
+                imageSize: tab.imageSize
+            )
         } else {
             TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
         }

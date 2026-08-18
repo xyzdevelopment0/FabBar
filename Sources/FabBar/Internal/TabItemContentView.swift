@@ -12,10 +12,15 @@ final class TabItemContentView: UIView {
     private var symbolName: String = ""
     private var customImageName: String = ""
     private var customImageBundleIdentifier: String = ""
+    private var customImageSize: CGFloat = 0
     private var title: String = ""
 
     private let font = UIFont.systemFont(ofSize: Constants.tabTitleFontSize, weight: .semibold)
-    private let imageAreaHeight = Constants.iconViewSize
+
+    /// Height reserved for the icon. Grows when a custom image is larger than the standard area.
+    private var imageAreaHeight: CGFloat {
+        max(Constants.iconViewSize, customImageSize)
+    }
 
     init(title: String, symbolName: String) {
         self.title = title
@@ -26,10 +31,11 @@ final class TabItemContentView: UIView {
         contentMode = .redraw
     }
 
-    init(title: String, imageName: String, imageBundle: Bundle?) {
+    init(title: String, imageName: String, imageBundle: Bundle?, imageSize: CGFloat?) {
         self.title = title
         self.customImageName = imageName
         self.customImageBundleIdentifier = imageBundle?.bundleIdentifier ?? ""
+        self.customImageSize = imageSize ?? 0
         super.init(frame: .zero)
         isOpaque = false
         isUserInteractionEnabled = false
@@ -42,6 +48,7 @@ final class TabItemContentView: UIView {
         self.symbolName = coder.decodeObject(forKey: "symbolName") as? String ?? ""
         self.customImageName = coder.decodeObject(forKey: "customImageName") as? String ?? ""
         self.customImageBundleIdentifier = coder.decodeObject(forKey: "customImageBundleIdentifier") as? String ?? ""
+        self.customImageSize = coder.decodeDouble(forKey: "customImageSize")
         self.title = coder.decodeObject(forKey: "title") as? String ?? ""
         super.init(coder: coder)
         // When unarchived by the accessibility popover, hide this view so only the
@@ -54,6 +61,7 @@ final class TabItemContentView: UIView {
         coder.encode(symbolName, forKey: "symbolName")
         coder.encode(customImageName, forKey: "customImageName")
         coder.encode(customImageBundleIdentifier, forKey: "customImageBundleIdentifier")
+        coder.encode(Double(customImageSize), forKey: "customImageSize")
         coder.encode(title, forKey: "title")
     }
 
@@ -122,9 +130,28 @@ final class TabItemContentView: UIView {
             } else {
                 bundle = Bundle(identifier: customImageBundleIdentifier)
             }
-            return UIImage(named: customImageName, in: bundle, with: config)
+            let image = UIImage(named: customImageName, in: bundle, with: config)
+            guard customImageSize > 0 else { return image }
+            return image?.resized(fittingSquareOf: customImageSize)
         }
 
         return nil
+    }
+}
+
+@available(iOS 26.0, *)
+extension UIImage {
+    /// Redraws the image to fit a square of the given point size, preserving aspect ratio.
+    func resized(fittingSquareOf side: CGFloat) -> UIImage {
+        guard size.width > 0, size.height > 0 else { return self }
+
+        let scale = min(side / size.width, side / size.height)
+        let target = CGSize(width: size.width * scale, height: size.height * scale)
+        let renderer = UIGraphicsImageRenderer(size: target)
+
+        return renderer.image { _ in
+            draw(in: CGRect(origin: .zero, size: target))
+        }
+        .withRenderingMode(.alwaysTemplate)
     }
 }

@@ -41,9 +41,7 @@ final class GlassTabBarView: UIView {
         fabGlassView = UIVisualEffectView(effect: fabGlassEffect)
 
         let button = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: Constants.fabIconPointSize, weight: .medium)
-        let buttonImage = UIImage(systemName: action.systemImage, withConfiguration: config)
-        button.setImage(buttonImage, for: .normal)
+        button.setImage(Self.buttonImage(for: action), for: .normal)
         button.tintColor = .white
         button.accessibilityLabel = action.accessibilityLabel
         button.accessibilityTraits = .button
@@ -57,6 +55,22 @@ final class GlassTabBarView: UIView {
         fabButton.tintAdjustmentMode = .automatic
 
         setupViews(action: action)
+    }
+
+    /// Resolves the FAB icon from either a custom bundle image or an SF Symbol.
+    private static func buttonImage(for action: FabBarAction) -> UIImage? {
+        let config = UIImage.SymbolConfiguration(pointSize: Constants.fabIconPointSize, weight: .medium)
+
+        if let imageName = action.image {
+            let image = UIImage(named: imageName, in: action.imageBundle, with: config)
+            guard let imageSize = action.imageSize else {
+                return image?.withRenderingMode(.alwaysTemplate)
+            }
+            return image?.resized(fittingSquareOf: imageSize)
+        }
+
+        guard let systemImage = action.systemImage else { return nil }
+        return UIImage(systemName: systemImage, withConfiguration: config)
     }
 
     private func setupViews(action: FabBarAction) {

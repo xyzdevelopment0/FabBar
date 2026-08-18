@@ -23,6 +23,9 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     /// The bundle containing the custom image. Defaults to `.main` if not specified.
     public let imageBundle: Bundle?
 
+    /// The point size to draw the custom image at. Uses the image's own size when nil.
+    public let imageSize: CGFloat?
+
     /// Called when the user taps this tab while it's already selected.
     /// Useful for scroll-to-top or similar behaviors.
     public let onReselect: (() -> Void)?
@@ -45,6 +48,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.systemImage = systemImage
         self.image = nil
         self.imageBundle = nil
+        self.imageSize = nil
         self.onReselect = onReselect
     }
 
@@ -55,12 +59,14 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
     ///   - title: The title displayed below the icon.
     ///   - image: The custom image name.
     ///   - imageBundle: The bundle containing the image. Defaults to `.main`.
+    ///   - imageSize: The point size to draw the image at. Defaults to the image's own size.
     ///   - onReselect: Called when the user taps this tab while it's already selected.
     public init(
         value: Value,
         title: String,
         image: String,
         imageBundle: Bundle? = nil,
+        imageSize: CGFloat? = nil,
         onReselect: (() -> Void)? = nil
     ) {
         self.value = value
@@ -68,6 +74,7 @@ public struct FabBarTab<Value: Hashable>: Identifiable {
         self.systemImage = nil
         self.image = image
         self.imageBundle = imageBundle ?? .main
+        self.imageSize = imageSize
         self.onReselect = onReselect
     }
 }
