@@ -28,7 +28,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         control.selectedSegmentIndex = selectedIndex
 
         configureSegmentContent(on: control)
-        control.selectedSegmentTintColor = segmentTintColor(for: control.traitCollection.userInterfaceStyle)
+        control.selectedSegmentTintColor = segmentTintColor(for: control.traitCollection)
         control.inactiveTintColor = inactiveTintColor
 
         control.addTarget(context.coordinator, action: #selector(context.coordinator.tabSelected(_:)), for: .valueChanged)
@@ -57,17 +57,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         context.coordinator.parent = self
 
         let control = uiView.segmentedControl
-
-        // Assigning selectedSegmentTintColor makes UISegmentedControl rebuild its selection
-        // indicator. updateUIView runs on every selection change, so reassigning the same
-        // color there re-renders the indicator mid-transition and reads as a brief flash.
-        // Only assign when the resolved color would actually differ.
-        let interfaceStyle = uiView.traitCollection.userInterfaceStyle
-        if context.coordinator.appliedInterfaceStyle != interfaceStyle {
-            context.coordinator.appliedInterfaceStyle = interfaceStyle
-            control.selectedSegmentTintColor = segmentTintColor(for: interfaceStyle)
-        }
-
+        control.selectedSegmentTintColor = segmentTintColor(for: uiView.traitCollection)
         control.inactiveTintColor = inactiveTintColor
         uiView.interactiveGlass = interactiveGlass
 
@@ -148,8 +138,8 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
         }
     }
 
-    private func segmentTintColor(for interfaceStyle: UIUserInterfaceStyle) -> UIColor {
-        switch interfaceStyle {
+    private func segmentTintColor(for traitCollection: UITraitCollection) -> UIColor {
+        switch traitCollection.userInterfaceStyle {
         case .dark:
             return .label.withAlphaComponent(0.15)
         default:
@@ -161,10 +151,6 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
     class Coordinator: NSObject {
         var parent: FabBarRepresentable<Value>
         var previousTabValues: [Value]
-
-        /// Interface style the segment tint was last resolved for, so it is only reassigned
-        /// when it would actually change.
-        var appliedInterfaceStyle: UIUserInterfaceStyle?
 
         init(parent: FabBarRepresentable<Value>) {
             self.parent = parent

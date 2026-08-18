@@ -54,18 +54,12 @@ final class TabBarSegmentedControl: UISegmentedControl {
     /// Tint color for the selected/highlighted tab's content view.
     /// Set to a concrete color (not the dynamic `.tintColor`) to avoid auto-dimming during sheet presentation.
     var activeTintColor: UIColor = .tintColor {
-        didSet {
-            guard activeTintColor != oldValue else { return }
-            updateContentViewColors()
-        }
+        didSet { updateContentViewColors() }
     }
 
     /// Tint color for unselected tab content views.
     var inactiveTintColor: UIColor = .label {
-        didSet {
-            guard inactiveTintColor != oldValue else { return }
-            updateContentViewColors()
-        }
+        didSet { updateContentViewColors() }
     }
 
     /// Called when user taps the already-selected segment.
