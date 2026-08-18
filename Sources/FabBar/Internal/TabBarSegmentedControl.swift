@@ -294,10 +294,22 @@ final class TabBarSegmentedControl: UISegmentedControl {
             cachedIndicatorView = findIndicatorView()
         }
         if let indicatorView = cachedIndicatorView {
-            // Stay in the presentation layer tree for both sides of the conversion
-            let presLayer = indicatorView.layer.presentation() ?? indicatorView.layer
-            let selfPresLayer = self.layer.presentation() ?? self.layer
-            return selfPresLayer.convert(presLayer.bounds, from: presLayer)
+            // Read the animated geometry off the presentation layer, but convert through the
+            // model tree. `presentation() ?? layer` resolves per layer, so a presentation layer
+            // on one side of convert(_:from:) can be paired with a model layer on the other —
+            // the control animates inside the glass hierarchy while the indicator may not, and
+            // vice versa. That mismatch skews the rect, and the skew clears in a single frame
+            // when the animation ends, snapping every mask at once.
+            let layer = indicatorView.layer
+            let presented = layer.presentation() ?? layer
+            let rect = CGRect(
+                x: presented.position.x - presented.bounds.width * presented.anchorPoint.x,
+                y: presented.position.y - presented.bounds.height * presented.anchorPoint.y,
+                width: presented.bounds.width,
+                height: presented.bounds.height
+            )
+            guard let superlayer = layer.superlayer else { return rect }
+            return self.layer.convert(rect, from: superlayer)
         }
 
         // Fallback: use the selected segment's frame (no animation, but always correct)
@@ -340,10 +352,8 @@ final class TabBarSegmentedControl: UISegmentedControl {
     }
 
     private func updateMasks(base baseView: TabItemContentView, accent accentView: TabItemContentView, indicatorRect: CGRect) {
-        // Use presentation layers for consistency with indicatorRect
-        let accentPres = accentView.layer.presentation() ?? accentView.layer
-        let selfPres = self.layer.presentation() ?? self.layer
-        let viewRectInControl = selfPres.convert(accentPres.bounds, from: accentPres)
+        // Model layers on both sides, matching the basis currentIndicatorRect() converts into.
+        let viewRectInControl = self.layer.convert(accentView.layer.bounds, from: accentView.layer)
 
         // Convert the indicator rect into the content view's local coordinate space.
         // Using the full capsule path (not a rect intersection) ensures rounded
