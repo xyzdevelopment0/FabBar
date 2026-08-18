@@ -44,26 +44,20 @@ public struct FabBar<Value: Hashable>: View {
     /// The floating action button configuration.
     public var action: FabBarAction
 
-    /// The color of unselected tab items. Defaults to `.label` when `nil`.
-    public var inactiveTint: Color?
-
     /// Creates a FabBar with the specified configuration.
     ///
     /// - Parameters:
     ///   - selection: A binding to the currently selected tab.
     ///   - tabs: The tabs to display.
     ///   - action: The floating action button configuration.
-    ///   - inactiveTint: The color of unselected tab items. Defaults to `.label`.
     public init(
         selection: Binding<Value>,
         tabs: [FabBarTab<Value>],
-        action: FabBarAction,
-        inactiveTint: Color? = nil
+        action: FabBarAction
     ) {
         self._selection = selection
         self.tabs = tabs
         self.action = action
-        self.inactiveTint = inactiveTint
     }
 
     public var body: some View {
@@ -77,7 +71,6 @@ public struct FabBar<Value: Hashable>: View {
             FabBarRepresentable(
                 tabs: tabs,
                 action: action,
-                inactiveTint: inactiveTint,
                 activeTab: $selection
             )
             .frame(height: Constants.barHeight)
