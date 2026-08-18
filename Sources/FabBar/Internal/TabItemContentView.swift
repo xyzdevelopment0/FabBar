@@ -65,18 +65,6 @@ final class TabItemContentView: UIView {
         coder.encode(title, forKey: "title")
     }
 
-    /// Keeps the backing store at display scale.
-    ///
-    /// The content lives inside the segmented control's glass effect view, and UIKit re-renders
-    /// that subtree at reduced fidelity while the glass animates. Because this view draws itself
-    /// in `draw(_:)` rather than compositing layers, a lowered scale factor means the icon and
-    /// title are literally redrawn blurry for the length of the transition, then redrawn crisp
-    /// once it settles.
-    override var contentScaleFactor: CGFloat {
-        get { super.contentScaleFactor }
-        set { super.contentScaleFactor = max(newValue, traitCollection.displayScale) }
-    }
-
     override func tintColorDidChange() {
         super.tintColorDidChange()
         setNeedsDisplay()
