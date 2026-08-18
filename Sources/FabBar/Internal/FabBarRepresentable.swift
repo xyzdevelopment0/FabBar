@@ -9,6 +9,7 @@ import UIKit
 struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
     var tabs: [FabBarTab<Value>]
     var action: FabBarAction
+    var inactiveTint: Color?
 
     @Binding var activeTab: Value
 
@@ -27,6 +28,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
 
         configureSegmentContent(on: control)
         control.selectedSegmentTintColor = segmentTintColor(for: control.traitCollection)
+        control.inactiveTintColor = inactiveTintColor
 
         control.addTarget(context.coordinator, action: #selector(context.coordinator.tabSelected(_:)), for: .valueChanged)
 
@@ -54,6 +56,7 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
 
         let control = uiView.segmentedControl
         control.selectedSegmentTintColor = segmentTintColor(for: uiView.traitCollection)
+        control.inactiveTintColor = inactiveTintColor
 
         // Sync segments when tabs change (count, order, or identity)
         let currentTabValues = tabs.map(\.value)
@@ -116,6 +119,14 @@ struct FabBarRepresentable<Value: Hashable>: UIViewRepresentable {
             TabItemContentView(title: tab.title, imageName: imageName, imageBundle: tab.imageBundle)
         } else {
             TabItemContentView(title: tab.title, symbolName: tab.systemImage ?? "")
+        }
+    }
+
+    private var inactiveTintColor: UIColor {
+        if let inactiveTint {
+            UIColor(inactiveTint)
+        } else {
+            .label
         }
     }
 
